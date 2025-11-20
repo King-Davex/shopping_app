@@ -11,7 +11,7 @@ class ProductPage extends StatefulWidget {
 }
 
 class _ProductPageState extends State<ProductPage> {
-  List<String> shoeItem = ['All',  'Nike', 'Addidas', 'Bata', 'Jordan'];
+  List<String> shoeItem = ['All',  'Nike', 'Addidas','Bata', 'Jordan'];
   late String selectedItem;
   List<Map<String, dynamic>> filteredProducts = [];
   @override
@@ -29,7 +29,7 @@ class _ProductPageState extends State<ProductPage> {
         filteredProducts = products;
       } else {
         filteredProducts = products
-            .where((product) => product['company'] == category)
+            .where((product) => category == product['company'] )
             .toList();
       }
     });
@@ -118,9 +118,9 @@ class _ProductPageState extends State<ProductPage> {
                       );
                     },
                     child: CardProduct(
-                      title: products[index]['title'] as String,
-                      cost: products[index]['price'] as double,
-                      image: products[index]['imageUrl'] as String,
+                      title: filteredProducts[index]['title'] as String,
+                      cost: filteredProducts[index]['price'] as double,
+                      image: filteredProducts[index]['imageUrl'] as String,
                       backgroundColor: index.isEven
                           ? const Color.fromARGB(255, 229, 236, 243)
                           : Colors.grey.shade200,
