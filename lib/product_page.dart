@@ -11,6 +11,9 @@ class ProductPage extends StatefulWidget {
 }
 
 class _ProductPageState extends State<ProductPage> {
+  TextEditingController searchController = TextEditingController();
+String searchText = '';
+
   List<String> shoeItem = ['All',  'Nike', 'Addidas','Bata', 'Jordan'];
   late String selectedItem;
   List<Map<String, dynamic>> filteredProducts = [];
@@ -21,19 +24,35 @@ class _ProductPageState extends State<ProductPage> {
     filteredProducts = products; // show all by default
   }
 
-  void filterProducts(String category) {
-    setState(() {
+  void filterProducts({String? category, String? search}) {
+  setState(() {
+    if (category != null) {
       selectedItem = category;
+    }
+    if (search != null) {
+      searchText = search;
+    }
 
-      if (category == 'All') {
-        filteredProducts = products;
-      } else {
-        filteredProducts = products
-            .where((product) => category == product['company'] )
-            .toList();
-      }
-    });
-  }
+    // Start with full list
+    filteredProducts = products;
+
+    // Apply category filter
+    if (selectedItem != 'All') {
+      filteredProducts = filteredProducts
+          .where((product) => product['company'] == selectedItem)
+          .toList();
+    }
+
+    // Apply search filter
+    if (searchText.isNotEmpty) {
+      filteredProducts = filteredProducts
+          .where((product) =>
+              product['title'].toLowerCase().contains(searchText.toLowerCase()))
+          .toList();
+    }
+  });
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -59,6 +78,7 @@ class _ProductPageState extends State<ProductPage> {
                 ),
                 Expanded(
                   child: TextField(
+                    controller: searchController,
                     decoration: InputDecoration(
                       prefixIcon: Icon(Icons.search, color: Colors.grey),
                       hintText: 'Search',
@@ -67,6 +87,9 @@ class _ProductPageState extends State<ProductPage> {
                       focusedBorder: border,
                       enabledBorder: border,
                     ),
+                    onChanged: (value) {
+                      filterProducts(search: value);
+                    },
                   ),
                 ),
               ],
@@ -82,7 +105,7 @@ class _ProductPageState extends State<ProductPage> {
                     child: GestureDetector(
                       onTap: () {
                         setState(() {
-                          filterProducts(shoeItem[index]);
+                          filterProducts(category: shoeItem[index]);
                         });
                       },
                       child: Chip(
